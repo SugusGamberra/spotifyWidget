@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const client_id = process.env.VITE_SPOTIFY_CLIENT_ID;
     const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
     
-    if (!client_secret) return res.status(500).json({ error: 'Falta configurar el Client Secret en Vercel' });
+    if (!client_secret) return res.status(500).json({ error: 'Falta configurar SPOTIFY_CLIENT_SECRET en Vercel' });
 
     const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
     
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         grant_type: 'authorization_code',
         code: code,
         redirect_uri: redirect_uri,
-        code_verifier: code_verifier,
+        code_verifier: code_verifier, 
         }),
     });
 
