@@ -9,7 +9,7 @@ function App() {
 
   const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
   
-  // detectar host dinamicamente
+  // detectar url local o produccion
   const HOST = window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")
     ? "http://127.0.0.1:5173"
     : window.location.origin;
@@ -69,9 +69,14 @@ function App() {
     const scope = 'user-read-private user-read-currently-playing offline_access';
     
     const args = new URLSearchParams({
-      response_type: 'code', client_id: CLIENT_ID, scope: scope,
-      redirect_uri: REDIRECT_URI, code_challenge_method: 'S256', code_challenge: codeChallenge
+      response_type: 'code', 
+      client_id: CLIENT_ID, 
+      scope: scope,
+      redirect_uri: REDIRECT_URI, 
+      code_challenge_method: 'S256', 
+      code_challenge: codeChallenge
     });
+    
     window.location.href = `https://accounts.spotify.com/authorize?${args}`;
   };
 
@@ -81,11 +86,10 @@ function App() {
     const code = urlParams.get('code');
     const uid = urlParams.get('uid');
 
-    // guardar en bd
     if (code) {
       setLoading(true);
       const codeVerifier = window.localStorage.getItem('code_verifier');
-
+      
       fetch(`/api/auth?code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&code_verifier=${codeVerifier}`)
         .then(r => r.json())
         .then(data => {
@@ -119,7 +123,7 @@ function App() {
       };
 
       fetchSong();
-      const interval = setInterval(fetchSong, 5000);
+      const interval = setInterval(fetchSong, 5000); 
       return () => clearInterval(interval);
     }
   }, []);
@@ -144,19 +148,17 @@ function App() {
             
             {loading && <p style={{textAlign: 'center'}}>Conectando cables... ⚡</p>}
 
-            {}
             {!isVisitor && !magicLink && !loading && (
               <div style={{textAlign: 'center'}}>
                 <p style={{color: '#ccc', marginBottom: '20px'}}>
                   Genera una URL permanente para compartir tu música.
                 </p>
                 <button onClick={handleLogin} className="login-btn">
-                  Crear mi Widget DB 🗄️
+                  Crear mi Widget 🗄️
                 </button>
               </div>
             )}
 
-            {}
             {magicLink && (
               <div style={{textAlign: 'center', wordBreak: 'break-all'}}>
                 <h3 style={{color: '#1DB954'}}>¡Guardado en BD! 💾</h3>
@@ -170,7 +172,6 @@ function App() {
               </div>
             )}
 
-            {}
             {isVisitor && (
               <>
                 {cancion ? (
@@ -178,7 +179,7 @@ function App() {
                     <img src={cancion.albumImageUrl} alt="Album" className="album-cover" />
                     <div className="song-info">
                       <h2 title={cancion.title}>{cancion.title}</h2>
-                      <p>{cancion.artist}</p>
+                      <p>{cancion.artista}</p>
                       <div style={{marginTop: '10px', fontSize: '0.8em', color: '#1DB954', display: 'flex', alignItems: 'center', gap: '5px'}}>
                           <span className="loading-pulse">●</span> En directo
                       </div>
