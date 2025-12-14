@@ -7,7 +7,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const cardRef = useRef(null);
 
-  const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+  const CLIENT_ID = import.meta.env.SPOTIFY_CLIENT_ID;
   
   // detectar url local o produccion
   const HOST = window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")
