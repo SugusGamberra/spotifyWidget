@@ -66,7 +66,7 @@ function App() {
     const codeChallenge = base64encode(hashed);
     window.localStorage.setItem('code_verifier', codeVerifier);
     
-    const scope = 'user-read-private user-read-currently-playing offline_access';
+    const scope = 'user-read-private user-read-currently-playing';
     
     const args = new URLSearchParams({
       response_type: 'code', 
