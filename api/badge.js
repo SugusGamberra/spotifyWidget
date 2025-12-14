@@ -7,14 +7,13 @@ const NOW_PLAYING_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-pla
 
 
 const escapeHtml = (str) => {
-    return str.replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
+    return str.replace(/&/g, '&')
+                .replace(/</g, '<')
+                .replace(/>/g, '>')
+                .replace(/"/g, '"')
                 .replace(/'/g, '&#39;');
 };
 
-// generar svg
 const generateSVG = (title, artist, coverUrl) => {
     const safeTitle = escapeHtml(title);
     const safeArtist = escapeHtml(artist);
@@ -22,7 +21,6 @@ const generateSVG = (title, artist, coverUrl) => {
     const template = `
     <svg width="360" height="110" viewBox="0 0 360 110" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
         <style>
-            /* Estilo oscuro de Spotify */
             .bg-card { fill: #181818; stroke: #303030; stroke-width: 1; rx: 12; }
             .title { font: 600 16px sans-serif; fill: #FFFFFF; }
             .artist { font: 14px sans-serif; fill: #B3B3B3; }
@@ -44,7 +42,6 @@ const generateSVG = (title, artist, coverUrl) => {
     return template;
 };
 
-// svg cuando no hay cancion
 const generateEmptySVG = () => {
     return `
         <svg width="360" height="110" viewBox="0 0 360 110" xmlns="http://www.w3.org/2000/svg">
@@ -69,52 +66,52 @@ export default async function handler(req, res) {
     try {
         const { rows } = await sql`SELECT refresh_token FROM widgets WHERE id = ${userId}`;
         if (rows.length === 0) {
-        res.setHeader('Content-Type', 'image/svg+xml');
-        return res.status(200).send(generateEmptySVG());
-    }
-
-    const refresh_token = rows[0].refresh_token;
-    
-    const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
-    const tokenResponse = await fetch(TOKEN_ENDPOINT, {
-        method: 'POST',
-        headers: { Authorization: `Basic ${basic}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh_token }),
-    });
-
-    const tokenData = await tokenResponse.json();
-    
-    if (tokenData.error) {
-        if (tokenData.refresh_token) {
-            await sql`UPDATE widgets SET refresh_token = ${tokenData.refresh_token} WHERE id = ${userId}`;
-        } else {
             res.setHeader('Content-Type', 'image/svg+xml');
             return res.status(200).send(generateEmptySVG());
         }
-    } else if (tokenData.refresh_token) {
+
+        const refresh_token = rows[0].refresh_token;
+        
+        const basic = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+        const tokenResponse = await fetch(TOKEN_ENDPOINT, {
+            method: 'POST',
+            headers: { Authorization: `Basic ${basic}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refresh_token }),
+        });
+
+        const tokenData = await tokenResponse.json();
+        
+        if (tokenData.error) {
+            if (tokenData.refresh_token) {
+                await sql`UPDATE widgets SET refresh_token = ${tokenData.refresh_token} WHERE id = ${userId}`;
+            } else {
+                res.setHeader('Content-Type', 'image/svg+xml');
+                return res.status(200).send(generateEmptySVG());
+            }
+        } else if (tokenData.refresh_token) {
             await sql`UPDATE widgets SET refresh_token = ${tokenData.refresh_token} WHERE id = ${userId}`;
-    }
-    
-    const songResponse = await fetch(NOW_PLAYING_ENDPOINT, {
-        headers: { Authorization: `Bearer ${tokenData.access_token}` },
-    });
+        }
+        
+        const songResponse = await fetch(NOW_PLAYING_ENDPOINT, {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` },
+        });
 
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 's-maxage=1, stale-while-revalidate'); 
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Cache-Control', 's-maxage=1, stale-while-revalidate'); 
 
-    if (songResponse.status === 204 || songResponse.status > 400) {
-        return res.status(200).send(generateEmptySVG());
-    }
+        if (songResponse.status === 204 || songResponse.status > 400) {
+            return res.status(200).send(generateEmptySVG());
+        }
 
-    const song = await songResponse.json();
-    
-    return res.status(200).send(
-        generateSVG(
-            song.item.name, 
-            song.item.artists.map((a) => a.name).join(', '), 
-            song.item.album.images[0].url
-        )
-    );
+        const song = await songResponse.json();
+        
+        return res.status(200).send(
+            generateSVG(
+                song.item.name, 
+                song.item.artists.map((a) => a.name).join(', '), 
+                song.item.album.images[0].url
+            )
+        );
 
     } catch (error) {
         res.setHeader('Content-Type', 'image/svg+xml');
