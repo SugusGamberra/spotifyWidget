@@ -33,6 +33,14 @@ export default async function handler(req, res) {
         const tokenData = await tokenResponse.json();
         if (tokenData.error) return res.status(401).json({ error: 'Token caducado' });
 
+        if (tokenData.refresh_token) {
+            await sql`
+                UPDATE widgets
+                SET refresh_token = ${tokenData.refresh_token}
+                WHERE id = ${userId}
+            `;
+        }
+
         const songResponse = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
         });
