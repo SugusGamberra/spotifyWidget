@@ -77,7 +77,7 @@ function App() {
       code_challenge: codeChallenge
     });
     
-    window.location.href = `https://accounts.spotify.com/authorize?${args.toString()}`;
+    window.location.href = `https://accounts.spotify.com/authorize?$?${args.toString()}`;
   };
 
   // logica principal
