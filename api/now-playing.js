@@ -13,9 +13,9 @@ export default async function handler(req, res) {
         }
 
         const refresh_token = rows[0].refresh_token;
-
         const client_id = process.env.VITE_SPOTIFY_CLIENT_ID;
-        const client_secret = process.env.VITE_SPOTIFY_CLIENT_SECRET;
+        const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+        
         const basic = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
         
         const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {

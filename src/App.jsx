@@ -84,7 +84,9 @@ function App() {
     // guardar en bd
     if (code) {
       setLoading(true);
-      fetch(`/api/auth?code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`)
+      const codeVerifier = window.localStorage.getItem('code_verifier');
+
+      fetch(`/api/auth?code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&code_verifier=${codeVerifier}`)
         .then(r => r.json())
         .then(data => {
           if (data.userId) {
@@ -92,7 +94,7 @@ function App() {
             setMagicLink(link);
             window.history.replaceState({}, null, "/"); 
           } else {
-            alert("Error conectando: " + (data.error || "Desconocido"));
+            alert("Error conectando: " + (data.error || "Revisa tus variables de entorno"));
           }
         })
         .catch(err => console.error(err))
