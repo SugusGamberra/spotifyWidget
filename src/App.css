@@ -1,42 +1,202 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root {
+  --glow-sens: 30;
+  --card-bg: linear-gradient(8deg,var(--dark) 75%, color-mix(in hsl, var(--dark), white 2.5%) 75.5%);
+  --blend: soft-light;
+  --glow-blend: plus-lighter;
+  --glow-color: 40deg 80% 80%;
+  --glow-boost: 0%;
+  --dark: hsl(260, 18%, 12%);
+  --fg: white;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: hsl(260, 18%, 12%);
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  display: grid;
+  place-items: center;
 }
 
 .card {
-  padding: 2em;
+  --pads: 30px;
+  --color-sens: calc(var(--glow-sens) + 20);
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --pointer-deg: 45deg;
+  --pointer-d: 0;
+  
+  position: relative;
+  width: 320px;
+  min-height: 450px;
+  border-radius: 1.768em;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgb(255 255 255 / 25%);
+  background: var(--card-bg);
+  background-repeat: no-repeat;
+  transition: transform 0.2s ease;
+  box-shadow: 
+      rgba(0, 0, 0, 0.3) 0px 10px 30px,
+      rgba(0, 0, 0, 0.1) 0px 4px 8px;
 }
 
-.read-the-docs {
-  color: #888;
+.card::before,
+.card::after,
+.card > .glow {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity 0.25s ease-out;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.card::before {
+  border: 1px solid transparent;
+  background:
+      linear-gradient(var(--card-bg) 0 100%) padding-box,
+      linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+      radial-gradient(at 80% 55%, hsla(268,100%,76%,1) 0px, transparent 50%) border-box,
+      radial-gradient(at 69% 34%, hsla(349,100%,74%,1) 0px, transparent 50%) border-box,
+      radial-gradient(at 8% 6%, hsla(136,100%,78%,1) 0px, transparent 50%) border-box,
+      linear-gradient(#c299ff 0 100%) border-box;
+  
+  opacity: calc((var(--pointer-d) - var(--color-sens)) / (100 - var(--color-sens)));
+  mask-image: conic-gradient(from var(--pointer-deg) at center, black 25%, transparent 40%, transparent 60%, black 75%);
+}
+
+.card::after {
+  background:
+      radial-gradient(at 80% 55%, hsla(268,100%,76%,1) 0px, transparent 50%) padding-box,
+      radial-gradient(at 69% 34%, hsla(349,100%,74%,1) 0px, transparent 50%) padding-box,
+      radial-gradient(at 8% 6%, hsla(136,100%,78%,1) 0px, transparent 50%) padding-box,
+      linear-gradient(#c299ff 0 100%) padding-box;
+      
+  mask-image:
+      linear-gradient(to bottom, black, black),
+      conic-gradient(from var(--pointer-deg) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+  mask-composite: subtract, add;
+  
+  opacity: calc((var(--pointer-d) - var(--color-sens)) / (100 - var(--color-sens)));
+  mix-blend-mode: var(--blend);
+}
+
+.card > .glow {
+  --outset: var(--pads);
+  inset: calc(var(--outset) * -1);
+  mask-image: conic-gradient(from var(--pointer-deg) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+  opacity: calc((var(--pointer-d) - var(--glow-sens)) / (100 - var(--glow-sens)));
+  mix-blend-mode: var(--glow-blend);
+}
+
+.card > .glow::before {
+  content: "";
+  position: absolute;
+  inset: var(--outset);
+  border-radius: inherit;
+  box-shadow: 
+      inset 0 0 0 1px hsl(var(--glow-color) / 100%),
+      0 0 25px 2px hsl(var(--glow-color) / calc(var(--glow-boost) + 20%));
+}
+
+.inner {
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 2;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+header h2 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+}
+
+.album-cover {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.album-cover:hover {
+  transform: scale(1.02);
+}
+
+.song-info h2 {
+  font-size: 1.4em;
+  margin: 0 0 5px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-info p {
+  color: #b3b3b3;
+  margin: 0;
+  font-size: 1em;
+}
+
+.login-btn, .spotify-btn {
+  background: #1DB954;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: auto;
+  transition: all 0.2s;
+}
+
+.login-btn:hover, .spotify-btn:hover {
+  background: #1ed760;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(29,185,84,0.5);
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.6);
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 0.7em;
+  margin-top: 15px;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  border-color: white;
+  color: white;
+}
+
+.loading-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
