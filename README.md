@@ -14,7 +14,7 @@ Widget interactivo creado con **React + Vite** que muestra en tiempo real qué c
 ![Demo del widget](./assets/widget.gif)
 
 <iframe
-    src="https://spotify-widget-psi.vercel.app/?uid=7sfwzy"
+    src="https://spotify-widget-psi.vercel.app/?uid=1m3114"
     width="360"
     height="500"
     frameborder="0"
