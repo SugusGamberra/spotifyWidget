@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
     if (!code) return res.status(400).json({ error: 'No hay código' });
 
-    const client_id = process.env.VITE_SPOTIFY_CLIENT_ID;
+    const client_id = process.env.SPOTIFY_CLIENT_ID;
     const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
     
     if (!client_secret) return res.status(500).json({ error: 'Falta configurar SPOTIFY_CLIENT_SECRET en Vercel' });
@@ -29,7 +29,6 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.error || !data.refresh_token) {
-        console.error("Error Spotify:", data);
         return res.status(401).json({ error: data.error_description || 'Error obteniendo token' });
     }
 
@@ -42,7 +41,6 @@ export default async function handler(req, res) {
         `;
         return res.status(200).json({ userId });
     } catch (error) {
-        console.error('Error DB:', error);
         return res.status(500).json({ error: 'Error guardando en base de datos' });
     }
 }
