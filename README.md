@@ -11,6 +11,8 @@ Widget interactivo creado con **React + Vite** que muestra en tiempo real qué c
 ## 🚀 Demo
 ¡Pruébalo en vivo aquí! 👉 [Ver Widget](https://spotify-widget-psi.vercel.app)
 
+![Demo del widget](./assets/widget.gif)
+
 ## 🛠️ Tecnologías
 - React 19
 - Vite
